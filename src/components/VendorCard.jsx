@@ -1,25 +1,20 @@
-function VendorCard() {
-  // TODO: replace with a real stall from YOUR own mahallah
-  const vendor = {
-    name: 'Kafe Mahallah Ali',
-    location: 'Mahallah Ali, Block C',
-    openHours: '7:00 am - 10:00 pm',
-    isOpen: true,
-  }
-
+function VendorCard({ vendor, isSelected, onSelect }) {
   return (
-    <div className="card vendor-card">
+    <button
+      type="button"
+      className={isSelected ? 'card vendor-card selected' : 'card vendor-card'}
+      onClick={() => onSelect(vendor.id)}
+    >
       <div className="thumb">{vendor.name.charAt(0)}</div>
-      <div className="vendor-info">
-        <strong>{vendor.name}</strong>
-        <br/>
-        <small>{vendor.location}</small>
-        <br/>
-        <small>Open: {vendor.openHours}</small>
-        <br/>
-        <span className={vendor.isOpen ? 'status open' : 'status closed'}> {vendor.isOpen ? 'Open now' : 'Closed'}</span>
+      <div>
+        <h3>{vendor.name}</h3>
+        <p className="muted">{vendor.location}</p>
+        <p className="muted">Open: {vendor.openHours}</p>
+        <span className={vendor.isOpen ? 'status open' : 'status closed'}>
+          {vendor.isOpen ? 'Open now' : 'Closed'}
+        </span>
       </div>
-    </div>
+    </button>
   )
 }
 

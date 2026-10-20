@@ -1,7 +1,22 @@
+import { useState } from 'react'
+
 function MenuItemCard({ item, onAdd }) {
+  const [isFavourite, setIsFavourite] = useState(false)
+
   return (
     <div className="card">
-      <div className="thumb">{item.name.charAt(0)}</div>
+      <div className="card-top">
+        <div className="thumb">{item.name.charAt(0)}</div>
+        <button
+          type="button"
+          className={isFavourite ? 'heart-btn favourite' : 'heart-btn'}
+          aria-label={isFavourite ? 'Remove from favourites' : 'Add to favourites'}
+          aria-pressed={isFavourite}
+          onClick={() => setIsFavourite(!isFavourite)}
+        >
+          {isFavourite ? '♥' : '♡'}
+        </button>
+      </div>
       <span className="tag">{item.category}</span>
       <h3>{item.name}</h3>
       <p className="muted">{item.description}</p>

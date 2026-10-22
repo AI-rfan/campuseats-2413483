@@ -1,4 +1,10 @@
 import { useEffect,useState } from 'react'
+import Header from './components/Header.jsx'
+import VendorCard from './components/VendorCard.jsx'
+import MenuList from './components/MenuList.jsx'
+import CartPage from './components/CartPage.jsx'
+import Footer from './components/Footer.jsx'
+import { Loading, ErrorMessage } from './components/Status.jsx'
 
 function App() {
   // Fetched data: one piece of state for each situation
@@ -138,6 +144,13 @@ function App() {
   }
 
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+
+  function handlePlaceOrder(details) {
+    const total = cart.reduce((sum, line) => sum + line.item.price * line.qty, 0)
+    setLastOrder({ ...details, total })
+    setCart([])
+    setView('done')
+  }
 
 
   return (

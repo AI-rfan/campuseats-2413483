@@ -1,8 +1,4 @@
-import { useState } from 'react'
-
-function MenuItemCard({ item, onAdd }) {
-  const [isFavourite, setIsFavourite] = useState(false)
-
+function MenuItemCard({ item, onAdd, isFavourite, onToggleFavourite }) {
   return (
     <div className="card">
       <div className="card-top">
@@ -12,7 +8,7 @@ function MenuItemCard({ item, onAdd }) {
           className={isFavourite ? 'heart-btn favourite' : 'heart-btn'}
           aria-label={isFavourite ? 'Remove from favourites' : 'Add to favourites'}
           aria-pressed={isFavourite}
-          onClick={() => setIsFavourite(!isFavourite)}
+          onClick={() => onToggleFavourite(item.id)}
         >
           {isFavourite ? '♥' : '♡'}
         </button>

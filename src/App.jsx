@@ -18,6 +18,9 @@ function App() {
   const [view, setView] = useState('menu') // 'menu' | 'cart' | 'done'
   const [lastOrder, setLastOrder] = useState(null)
   
+  const [favourites, setFavourites] = useState([]) // array of item ids
+  const [favouritesOnly, setFavouritesOnly] = useState(false)
+  
   // Runs after the first render, and again whenever reloadKey changes.
   useEffect(() => {
     const controller = new AbortController()
@@ -44,7 +47,12 @@ function App() {
   }, [reloadKey])
 
   const selectedVendor = vendors.find((v) => v.id === selectedVendorId)
-
+  const visibleItems = selectedVendor
+    ? selectedVendor.menu.filter((item) =>
+        favouritesOnly ? favourites.includes(item.id) : true
+      )
+    : []
+    
 
   let content
     if (view === 'cart') {
@@ -66,14 +74,9 @@ function App() {
       </section>
     )
   } else if (loading) {
-    content = <div className="loading-spinner">Loading...</div>;
+    content = <Loading message="Loading vendors..." />
   } else if (error) {
-    content = (
-      <ErrorMessage
-        message={error.message || 'Something went wrong.'}
-        onRetry={() => setReloadKey((k) => k + 1)}
-      />
-    );
+    content = <ErrorMessage message={error} onRetry={() => setReloadKey((k) => k + 1)} />
   } else {
     content = (
       <>
@@ -143,13 +146,19 @@ function App() {
     setCart((prev) => prev.filter((line) => line.item.id !== itemId))
   }
 
-  const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const cartCount = cart.reduce((sum, line) => sum + line.qty, 0);
 
   function handlePlaceOrder(details) {
     const total = cart.reduce((sum, line) => sum + line.item.price * line.qty, 0)
     setLastOrder({ ...details, total })
     setCart([])
     setView('done')
+  }
+
+  function handleToggleFavourite(itemId) {
+    setFavourites((prev) =>
+      prev.includes(itemId) ? prev.filter((id) => id !== itemId) : [...prev, itemId]
+    )
   }
 
 

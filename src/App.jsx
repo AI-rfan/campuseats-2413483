@@ -1,4 +1,5 @@
-import { useEffect,useState } from 'react'
+import { useState } from 'react'
+import { useVendors } from './hooks/useVendor.js'
 import Header from './components/Header.jsx'
 import VendorCard from './components/VendorCard.jsx'
 import MenuList from './components/MenuList.jsx'
@@ -10,9 +11,9 @@ function App() {
   // Fetched data: one piece of state for each situation
   
   const [selectedVendorId, setSelectedVendorId] = useState(null)
-  const [cart, setCart] = useState([]) // lines of { item, qty }
   const [view, setView] = useState('menu') // 'menu' | 'cart' | 'done'
   const [lastOrder, setLastOrder] = useState(null)
+  const { vendors, loading, error, reload } = useVendors(setSelectedVendorId)
   
   const [favourites, setFavourites] = useState([]) // array of item ids
   const [favouritesOnly, setFavouritesOnly] = useState(false)
@@ -28,12 +29,7 @@ function App() {
   let content
     if (view === 'cart') {
       content = (
-        <CartPage
-          cart={cart}
-          onChangeQty={handleChangeQty}
-          onRemove={handleRemove}
-          onPlaceOrder={handlePlaceOrder}
-        />
+        <CartPage onOrderPlaced={handleOrderPlaced} />
       )
   } else if (view === 'done') {
     content = (
@@ -47,7 +43,7 @@ function App() {
   } else if (loading) {
     content = <Loading message="Loading vendors..." />
   } else if (error) {
-    content = <ErrorMessage message={error} onRetry={() => setReloadKey((k) => k + 1)} />
+    content = <ErrorMessage message={error} onRetry={reload} />
   } else {
     content = (
       <>
@@ -76,7 +72,6 @@ function App() {
             </label>
             <MenuList
               items={visibleItems}
-              onAdd={handleAddToCart}
               favourites={favourites}
               onToggleFavourite={handleToggleFavourite}
               emptyMessage={
@@ -91,38 +86,8 @@ function App() {
     );
   }
 
-  function handleAddToCart(item) {
-    setCart((prev) => {
-      const existing = prev.find((line) => line.item.id === item.id)
-      if (existing) {
-        // Already in the cart: copy every line, and add 1 to the matching one
-        return prev.map((line) =>
-          line.item.id === item.id ? { ...line, qty: line.qty + 1 } : line)
-      }
-      return [...prev, { item, qty: 1 }] // new line
-    })
-  }
-
-  function handleChangeQty(itemId, delta) {
-    setCart((prev) =>
-      prev
-        .map((line) =>
-          line.item.id === itemId ? { ...line, qty: line.qty + delta } : line
-        )
-        .filter((line) => line.qty > 0) // qty 0 means the line disappears
-    )
-  }
-
-  function handleRemove(itemId) {
-    setCart((prev) => prev.filter((line) => line.item.id !== itemId))
-  }
-
-  const cartCount = cart.reduce((sum, line) => sum + line.qty, 0);
-
-  function handlePlaceOrder(details) {
-    const total = cart.reduce((sum, line) => sum + line.item.price * line.qty, 0)
-    setLastOrder({ ...details, total })
-    setCart([])
+  function handleOrderPlaced(order) {
+    setLastOrder(order)
     setView('done')
   }
 
@@ -135,8 +100,10 @@ function App() {
 
   return (
     <>
-      <Header cartCount={cartCount}
-              onShowMenu={() => setView('menu')} onShowCart={() => setView('cart')} />
+      <Header
+        onShowMenu={() => setView('menu')}
+        onShowCart={() => setView('cart')}
+      />
       <main className="container">{content}</main>
       <Footer />
     </>

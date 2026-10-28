@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-export function useVendors() {
+export function useVendors(setSelectedVendorId) {
   const [vendors, setVendors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -8,8 +8,6 @@ export function useVendors() {
   // Runs after the first render, and again whenever reloadKey changes.
   useEffect(() => {
     const controller = new AbortController();
-    setLoading(true);
-    setError(null);
 
     fetch("/api/vendors.json", { signal: controller.signal })
       .then((res) => {
@@ -28,8 +26,12 @@ export function useVendors() {
         if (!controller.signal.aborted) setLoading(false);
       });
     return () => controller.abort(); // cleanup: cancel an old request
-  }, [reloadKey]);
+  }, [reloadKey, setSelectedVendorId]);
   
-  const reload = () => setReloadKey((k) => k + 1);
+  const reload = () => {
+    setError(null);
+    setLoading(true);
+    setReloadKey((k) => k + 1);
+  };
   return { vendors, loading, error, reload };
 }

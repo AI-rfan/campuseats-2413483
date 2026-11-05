@@ -1,6 +1,6 @@
 // Small components for the loading and error states of fetched data.
-export function Loading() {
-    return <p className="muted" role="status">Loading menus…</p>
+export function Loading({ message = 'Loading menus…' }) {
+    return <p className="muted" role="status">{message}</p>
 }
 export function ErrorMessage({ message, onRetry }) {
     return (

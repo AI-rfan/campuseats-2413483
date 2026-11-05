@@ -3,11 +3,10 @@ import { useCart } from '../hooks/useCart.js'
 
 function MenuList({
   items,
-  favourites,
-  onToggleFavourite,
+  vendor,
   emptyMessage = 'No items on this menu yet.',
 }) {
-  const { addToCart } = useCart()
+  const { addToCart, isFavourite, toggleFavourite } = useCart()
 
   if (items.length === 0) {
     return <p className="muted">{emptyMessage}</p>
@@ -20,8 +19,8 @@ function MenuList({
           key={item.id}
           item={item}
           onAdd={addToCart}
-          isFavourite={favourites.includes(item.id)}
-          onToggleFavourite={onToggleFavourite}
+          isFavourite={isFavourite(item.id)}
+          onToggleFavourite={() => toggleFavourite(item, vendor)}
         />
       ))}
     </div>

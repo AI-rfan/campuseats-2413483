@@ -2,12 +2,13 @@ import { useState } from 'react'
 import { useParams } from 'react-router'
 import MenuList from '../components/MenuList.jsx'
 import { ErrorMessage, Loading } from '../components/Status.jsx'
+import { useCart } from '../hooks/useCart.js'
 import { useVendors } from '../hooks/useVendor.js'
 
 function VendorPage() {
   const { id } = useParams()
   const { vendors, loading, error, reload } = useVendors()
-  const [favourites, setFavourites] = useState([])
+  const { isFavourite } = useCart()
   const [favouritesOnly, setFavouritesOnly] = useState(false)
 
   if (loading) return <Loading message="Loading vendor..." />
@@ -17,16 +18,8 @@ function VendorPage() {
   if (!vendor) return <p className="muted">Vendor not found</p>
 
   const visibleItems = vendor.menu.filter((item) =>
-    favouritesOnly ? favourites.includes(item.id) : true
+    favouritesOnly ? isFavourite(item.id) : true
   )
-
-  function handleToggleFavourite(itemId) {
-    setFavourites((previous) =>
-      previous.includes(itemId)
-        ? previous.filter((id) => id !== itemId)
-        : [...previous, itemId]
-    )
-  }
 
   return (
     <>
@@ -42,8 +35,7 @@ function VendorPage() {
       </label>
       <MenuList
         items={visibleItems}
-        favourites={favourites}
-        onToggleFavourite={handleToggleFavourite}
+        vendor={vendor}
         emptyMessage={
           favouritesOnly
             ? 'No favourites on this menu yet.'

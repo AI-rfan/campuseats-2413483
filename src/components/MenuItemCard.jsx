@@ -1,4 +1,6 @@
-function MenuItemCard({ item, onAdd, isFavourite, onToggleFavourite }) {
+import { Link } from 'react-router'
+
+function MenuItemCard({ item, onAdd, isFavourite, onToggleFavourite, vendor }) {
   return (
     <div className="card">
       <div className="card-top">
@@ -8,7 +10,7 @@ function MenuItemCard({ item, onAdd, isFavourite, onToggleFavourite }) {
           className={isFavourite ? 'heart-btn favourite' : 'heart-btn'}
           aria-label={isFavourite ? 'Remove from favourites' : 'Add to favourites'}
           aria-pressed={isFavourite}
-          onClick={() => onToggleFavourite(item.id)}
+          onClick={onToggleFavourite}
         >
           {isFavourite ? '♥' : '♡'}
         </button>
@@ -16,6 +18,11 @@ function MenuItemCard({ item, onAdd, isFavourite, onToggleFavourite }) {
       <span className="tag">{item.category}</span>
       <h3>{item.name}</h3>
       <p className="muted">{item.description}</p>
+      {vendor && (
+        <p className="muted">
+          From <Link to={`/vendor/${vendor.id}`}>{vendor.name}</Link>
+        </p>
+      )}
       <p className="price">RM {item.price.toFixed(2)}</p>
       <button
         type="button"
